@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
   </head>
   <body>
-    <form method="post">
+    <form method="post" id="form" enctype='multipart/form-data'>
       {% csrf_token %}
       {{form|linebreaks}}
       <button type="submit">Submit</button>
