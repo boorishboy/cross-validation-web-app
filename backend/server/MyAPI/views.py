@@ -1,19 +1,47 @@
 from django.shortcuts import render
 from rest_framework import viewsets
-from rest_framework.decorators import api_view
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from django.core import serializers
-from . serializers import parametersSerializer
-from . models import Parameters
+from . serializers import parametersSerializer, resultSerializer, resultsOLSSerializer, resultsNNLSSerializer
+from . models import Parameters, ResultsNNLS, ResultsOLS
 from . forms import ParametersForm
 import pandas as pd
-import csv
 from django.conf import settings
 from . import MLModel
+from collections import namedtuple
 # Create your views here.
 
+
 class ParametersView(viewsets.ModelViewSet):
-	queryset = Parameters.objects.all()
-	serializer_class = parametersSerializer
+    queryset = Parameters.objects.all()
+    serializer_class = parametersSerializer
+
+# ResultResponse = namedtuple('ResultResponse', ('resultsNNLS', 'resultsOLS'))
+
+
+# class ResultsView(viewsets.ViewSet):
+#     def list(self, request):
+#         resultResponse = ResultResponse(
+#             resultsNNLS=ResultsNNLS.objects.all(),
+#             resultsOLS=ResultsOLS.objects.all(),
+#         )
+#         serializer = resultSerializer(resultResponse)
+#         return Response(serializer.data)
+#
+#     def destroy(self, request):
+#         instance = self.get_object()
+#         self.perform_destroy(instance)
+#         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class ResultsOLSView(viewsets.ModelViewSet):
+    queryset = ResultsOLS.objects.all()
+    serializer_class = resultsOLSSerializer
+
+class ResultsNNLSView(viewsets.ModelViewSet):
+    queryset = ResultsNNLS.objects.all()
+    serializer_class = resultsNNLSSerializer
+
 
 
 def myform(request):
@@ -32,21 +60,12 @@ def myform(request):
                 f.write(inputFile)
                 f.close()
             data = pd.read_csv(path)
+            print(paramList)
+            MLModel.get_data(data, paramList, targetColumn,
+                              adjust, round, threshold)
+            form.save()
+        return redirect('/dashboard/')
 
     form = ParametersForm()
 
     return render(request, 'myform/form.html', {'form': form})
-
-
-# def DataProcessing(data, paramList, targetColumn, adjust, round, fixed, threshold):
-
-#     NNLS = 0
-#     OLS = 1
-#
-#     y = df.loc[:,target_column].values
-#     # Adjust the regressand.
-#     y = y * adjust
-#     fixed = "{}"
-#     param_value_dict = eval(fixed)
-#     fixed_params = param_value_dict.keys()
-#     unconstrained_params = []

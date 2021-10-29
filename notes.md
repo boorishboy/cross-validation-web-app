@@ -1,11 +1,11 @@
 # Cross validation web app for RISC-V time modeling using Django
 
 ## Idea
-Basic idea is to create a tool to interactively analyze and present ML model. In this particular case it will be cross validation for RISC-V time consumption (and optionally energy). 
+Basic idea is to create a tool to interactively analyze and present ML model. In this particular case it will be cross validation for RISC-V time consumption (and optionally energy).
 ## Resources
 
 ## What needs to be done
-
+Create a function in views that receives data from ml model and puts them into json dict 
 ## Changes done
 
 1. Display_scores wrong variable and deleted ***nmse_scores*** as it duplicates with ***scores*** variable
