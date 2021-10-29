@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.views.generic import View
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -12,6 +13,14 @@ from . import MLModel
 from collections import namedtuple
 # Create your views here.
 
+
+class HomeView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'index.html', {})
+
+class DashboardView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'dashboard/dashboard.html', {})
 
 class ParametersView(viewsets.ModelViewSet):
     queryset = Parameters.objects.all()
@@ -60,10 +69,8 @@ def myform(request):
                 f.write(inputFile)
                 f.close()
             data = pd.read_csv(path)
-            print(paramList)
             MLModel.get_data(data, paramList, targetColumn,
                               adjust, round, threshold)
-            form.save()
         return redirect('/dashboard/')
 
     form = ParametersForm()

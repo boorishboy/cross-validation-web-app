@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+<script>
+{% block jquery %}
+{% endblock %}
+</script>
+
+{% block content %}
+
+<div class='row justify-content-center'>
+  <div class='col-4 my-5 text-center'>
+    <h1>Hello, World!</h1>
+</div>
+<div class='row justify-content-center'>
+  <div class='col-4 my-5 text-center'>
+    <a class="btn btn-primary" href="/form/" role="button">Input Data</a>
+  </div>
+  <div class='col-4 my-5 text-center'>
+    <a class="btn btn-primary" href="/dashboard/" role="button">View Results</a>
+  </div>
+
+{% endblock content %}

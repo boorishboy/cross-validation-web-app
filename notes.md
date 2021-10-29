@@ -5,7 +5,7 @@ Basic idea is to create a tool to interactively analyze and present ML model. In
 ## Resources
 
 ## What needs to be done
-Create a function in views that receives data from ml model and puts them into json dict 
+Create a function in views that receives data from ml model and puts them into json dict
 ## Changes done
 
 1. Display_scores wrong variable and deleted ***nmse_scores*** as it duplicates with ***scores*** variable
@@ -44,3 +44,8 @@ print(y)
 x = df.loc[:,param_list].values
 print(x)
 ```
+
+
+
+## TODO
+- Change form type to ModelForm and override widgets: [Override Django Form Widgets](https://stackoverflow.com/questions/9878475/django-modelform-override-widget)

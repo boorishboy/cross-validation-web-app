@@ -8,6 +8,8 @@ router.register('results-nnls', views.ResultsNNLSView)
 router.register('results-ols', views.ResultsOLSView)
 
 urlpatterns = [
+    path('', views.HomeView.as_view(), name='home'),
+    path('dashboard/', views.DashboardView.as_view(), name='result-dashboard'),
     path('form/', views.myform, name='myform'),
     path('api/', include(router.urls)),
 ]
