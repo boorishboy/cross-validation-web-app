@@ -12,4 +12,5 @@ urlpatterns = [
     path('dashboard/', views.DashboardView.as_view(), name='result-dashboard'),
     path('form/', views.myform, name='myform'),
     path('api/', include(router.urls)),
+    path('result-detail', views.ResultDetailView.as_view(), name='result-detail'),
 ]

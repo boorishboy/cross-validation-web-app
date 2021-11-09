@@ -14,6 +14,7 @@ from sklearn.model_selection import KFold
 from sklearn.base import clone
 from sklearn.model_selection import cross_val_score
 from . models import ResultsNNLS, ResultsOLS
+import ast
 
 
 NNLS = 0
@@ -52,7 +53,7 @@ def get_data(df, param_list, target_column, adjust, round, threshold):
     if adjust is not None:
         y = y * adjust
     fixed = "{}"
-    param_value_dict = eval(fixed)
+    param_value_dict = ast.literal_eval(fixed)
     fixed_params = param_value_dict.keys()
     unconstrained_params = []
 
@@ -193,7 +194,7 @@ def get_data(df, param_list, target_column, adjust, round, threshold):
             r2 = r2_score(y, predicted[i])
             resultsNNLS.rmse = str(rmse)
             resultsNNLS.r2_score = str(r2)
-            resultsNNLS.save()
+            # resultsNNLS.save()
             # print(("RMSE Score %s:" % get_mode_name(i)) + str(rmse))
             # print(("R2 Score %s:" % get_mode_name(i)) + str(r2_score(y, predicted[i])))
 
@@ -248,7 +249,7 @@ def get_data(df, param_list, target_column, adjust, round, threshold):
             r2 = r2_score(y, predicted[i])
             resultsOLS.rmse = str(rmse)
             resultsOLS.r2_score = str(r2)
-            resultsOLS.save()
+            # resultsOLS.save()
             # print(("RMSE Score %s:" % get_mode_name(i)) + str(rmse))
             # print(("R2 Score %s:" % get_mode_name(i)) + str(r2_score(y, predicted[i])))
 
@@ -257,3 +258,4 @@ def get_data(df, param_list, target_column, adjust, round, threshold):
             # print("=================================================")
             # [print("%s: %.9f, %.9f, %5.2f%%" % elt)
             #  if elt else None for elt in outliers[i]]
+    return resultsOLS, resultsNNLS
