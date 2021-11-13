@@ -20,6 +20,8 @@ import ast
 NNLS = 0
 OLS = 1
 
+resultsNNLS = ResultsNNLS()
+resultsOLS = ResultsOLS()
 
 def get_mode_name(mode):
     '''Return name of the current mode.'''
@@ -113,6 +115,8 @@ def get_data(df, param_list, target_column, adjust, round, threshold):
     regressor3.fit(x, y)
     pred = regressor3.predict(x)
     # print(param_list)
+    with np.printoptions(linewidth=200):
+        print(regressor3.coef_)
     coefs[OLS] = regressor3.coef_
     predicted[OLS] = pred
 
@@ -144,8 +148,6 @@ def get_data(df, param_list, target_column, adjust, round, threshold):
     # mse = [None] * 2
     # rmse = [None] * 2
 
-    resultsNNLS = ResultsNNLS()
-    resultsOLS = ResultsOLS()
 
     for i in [NNLS, OLS]:
         if i == NNLS:
@@ -164,7 +166,7 @@ def get_data(df, param_list, target_column, adjust, round, threshold):
             mean_percentage_error = (
                 percentage_error_vect).mean() * 100.0
             resultsNNLS.mean_percentage_error = mean_percentage_error
-            resultsNNLS.percentage_error_vect = str(percentage_error_vect)
+            resultsNNLS.percentage_error_vect = str(list(percentage_error_vect))
             # print("MEAN(percentage_error_%s) = %.5f%%" %
             #       (get_mode_name(i), mean_percentage_error[i] * 100.0))
 
@@ -219,7 +221,7 @@ def get_data(df, param_list, target_column, adjust, round, threshold):
             mean_percentage_error = (
                 percentage_error_vect).mean() * 100.0
             resultsOLS.mean_percentage_error = mean_percentage_error
-            resultsOLS.percentage_error_vect = str(percentage_error_vect)
+            resultsOLS.percentage_error_vect = str(list(percentage_error_vect))
             # print("MEAN(percentage_error_%s) = %.5f%%" %
             #       (get_mode_name(i), mean_percentage_error[i] * 100.0))
 

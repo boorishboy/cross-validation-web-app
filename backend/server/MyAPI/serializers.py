@@ -11,8 +11,6 @@ class ResultsNNLSSerializer(serializers.ModelSerializer):
 	class Meta:
 		model=ResultsNNLS
 		fields = '__all__'
-		# fields = ['nnlsid', 'outliers', 'mean_abs_percentage_error', 'percentage_error_vect', 'mean_percentage_error', 'median_percentage_error', 'rmsre', 'stddev_abs_percentage_error', 'stddev_relative_error', 'rmse',
-		# 'r2_score', 'runid']
 
 class ParametersSerializer(serializers.ModelSerializer):
 	resultsols = resultsOLSSerializer(read_only=True, many=True)

@@ -16,6 +16,7 @@ import ast
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 import time
+import os
 # Create your views here.
 
 
@@ -70,7 +71,7 @@ def myform(request):
             else:
                 fixed = form.cleaned_data['fixed']
             threshold = form.cleaned_data['threshold']
-            path = settings.TMP_FILES + '/data.csv'
+            path = settings.TMP_FILES + '/data' + str(os.getpid()) + '.csv'
             with open(path, 'w+b') as f:
                 f.write(inputFile)
                 f.close()
@@ -80,8 +81,10 @@ def myform(request):
                               adjust, round, threshold)
             resultOLS.runid = Parameters.objects.latest('runid')
             resultNNLS.runid = Parameters.objects.latest('runid')
+            # os.remove(path)
             resultOLS.save()
             resultNNLS.save()
+
 
 
 
