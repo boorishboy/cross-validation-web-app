@@ -4,8 +4,8 @@ from rest_framework import routers
 
 router = routers.DefaultRouter()
 router.register('input', views.ParametersView)
-router.register('results-nnls', views.ResultsNNLSView)
-router.register('results-ols', views.ResultsOLSView)
+router.register('results', views.ResultsView)
+
 
 urlpatterns = [
     path('', views.HomeView.as_view(), name='home'),

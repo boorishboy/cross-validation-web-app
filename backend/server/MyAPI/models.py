@@ -6,6 +6,8 @@ from django.conf import settings
 
 class Parameters(models.Model):
     runid = models.AutoField(primary_key=True)
+    upload_timestamp = models.DateTimeField(default=None)
+    file_hash = models.CharField(max_length=32, default=None)
     inputFile = models.FileField(storage=FileSystemStorage(location=settings.MEDIA_ROOT), upload_to='uploads', default=None)
     paramList = models.TextField(default=None)
     targetColumn = models.CharField(max_length=64, default=None)
@@ -13,57 +15,65 @@ class Parameters(models.Model):
     round = models.IntegerField(default=5)
     fixed = models.CharField(max_length=32, default=None, blank=True, null=True)
     threshold = models.IntegerField(default=5, null=True, blank=True)
-    # resultsNNLS = models.ForeignKey(
-    #     ResultsNNLS,
-    #     on_delete=models.CASCADE
-    #     )
-    # resultsOLS = models.ForeignKey(
-    #     ResultsOLS,
-    #     on_delete=models.CASCADE
-    #     )
-    # class Meta:
-    #         unique_together =(('resultsNNLS', 'resultsOLS'),)
 
     def __str__(self):
-        return str(self.paramList)
+        return str(self.upload_timestamp) + " " + str(self.paramList)
 
-    def delete(self, *args, **kwargs):
-        super().delete(*args, **kwargs)
-
-
-class ResultsOLS(models.Model):
-    runid = models.ForeignKey(
+class Results(models.Model):
+    runid = models.OneToOneField(
         Parameters,
-        related_name = 'resultsols',
-        on_delete = models.CASCADE
+        related_name = 'results',
+        on_delete = models.CASCADE,
     )
-    resultolsid = models.AutoField(primary_key=True)
-    outliers = models.CharField(max_length=255, default=None)
-    mean_abs_percentage_error = models.FloatField(default=None)
-    percentage_error_vect = models.TextField(default=None)
-    mean_percentage_error = models.FloatField(default=None)
-    median_percentage_error = models.FloatField(default=None)
-    rmsre = models.FloatField(default=None)
-    stddev_abs_percentage_error = models.FloatField(default=None)
-    stddev_relative_error = models.FloatField(default=None)
-    rmse = models.CharField(max_length=64, default=None)
-    r2_score = models.CharField(max_length=64, default=None)
+    resultid = models.AutoField(primary_key=True)
+    file_hash = models.CharField(max_length=32, default=None)
+    upload_timestamp = models.DateTimeField(default=None)
+    results_timestamp = models.DateTimeField(default=None)
+    rkf_scores = models.CharField(max_length=255, default=None)
+    rkf_mean = models.FloatField(default=None)
+    rkf_stddev = models.FloatField(default=None)
+    cv_scores = models.CharField(max_length=255, default=None)
+    cv_mean = models.FloatField(default=None)
+    cv_stddev = models.FloatField(default=None)
+    coefs_ols = models.TextField(default=None)
+    coefs_nnls = models.TextField(default=None)
+    outliers_ols = models.TextField(default=None)
+    mean_abs_percentage_error_ols = models.FloatField(default=None)
+    percentage_error_vect_ols = models.TextField(default=None)
+    mean_percentage_error_ols = models.FloatField(default=None)
+    median_percentage_error_ols = models.FloatField(default=None)
+    rmsre_ols = models.FloatField(default=None)
+    stddev_abs_percentage_error_ols = models.FloatField(default=None)
+    stddev_relative_error_ols = models.FloatField(default=None)
+    rmse_ols = models.CharField(max_length=64, default=None)
+    r2_score_ols = models.CharField(max_length=64, default=None)
+    outliers_nnls = models.TextField(default=None)
+    mean_abs_percentage_error_nnls = models.FloatField(default=None)
+    percentage_error_vect_nnls = models.TextField(default=None)
+    mean_percentage_error_nnls = models.FloatField(default=None)
+    median_percentage_error_nnls = models.FloatField(default=None)
+    rmsre_nnls = models.FloatField(default=None)
+    stddev_abs_percentage_error_nnls = models.FloatField(default=None)
+    stddev_relative_error_nnls = models.FloatField(default=None)
+    rmse_nnls = models.CharField(max_length=64, default=None)
+    r2_score_nnls = models.CharField(max_length=64, default=None)
 
 
-class ResultsNNLS(models.Model):
-    runid = models.ForeignKey(
-        Parameters,
-        related_name = 'resultsnnls',
-        on_delete = models.CASCADE
-    )
-    resultnnlsid = models.AutoField(primary_key=True)
-    outliers = models.CharField(max_length=255, default=None)
-    mean_abs_percentage_error = models.FloatField(default=None)
-    percentage_error_vect = models.TextField(default=None)
-    mean_percentage_error = models.FloatField(default=None)
-    median_percentage_error = models.FloatField(default=None)
-    rmsre = models.FloatField(default=None)
-    stddev_abs_percentage_error = models.FloatField(default=None)
-    stddev_relative_error = models.FloatField(default=None)
-    rmse = models.CharField(max_length=64, default=None)
-    r2_score = models.CharField(max_length=64, default=None)
+
+# class ResultsNNLS(models.Model):
+#     runid = models.ForeignKey(
+#         Parameters,
+#         related_name = 'resultsnnls',
+#         on_delete = models.CASCADE
+#     )
+#     resultnnlsid = models.AutoField(primary_key=True)
+#     outliers = models.CharField(max_length=255, default=None)
+#     mean_abs_percentage_error = models.FloatField(default=None)
+#     percentage_error_vect = models.TextField(default=None)
+#     mean_percentage_error = models.FloatField(default=None)
+#     median_percentage_error = models.FloatField(default=None)
+#     rmsre = models.FloatField(default=None)
+#     stddev_abs_percentage_error = models.FloatField(default=None)
+#     stddev_relative_error = models.FloatField(default=None)
+#     rmse = models.CharField(max_length=64, default=None)
+#     r2_score = models.CharField(max_length=64, default=None)

@@ -4,19 +4,19 @@ from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.core import serializers
-from . serializers import ParametersSerializer, resultsOLSSerializer, ResultsNNLSSerializer
-from . models import Parameters, ResultsNNLS, ResultsOLS
+from . serializers import ParametersSerializer, ResultsSerializer
+from . models import Parameters, Results
 from . forms import ParametersForm
 import pandas as pd
 from django.conf import settings
 from . import MLModel
 from collections import namedtuple
 from django.shortcuts import redirect, get_object_or_404
-import ast
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-import time
+from datetime import datetime
 import os
+import hashlib
 # Create your views here.
 
 
@@ -36,15 +36,17 @@ class ResultDetailView(View):
     def get(self, request, *args, **kwargs):
         return render(request, 'results/result_detail.html', {})
 
-class ResultsOLSView(viewsets.ModelViewSet):
-    queryset = ResultsOLS.objects.all()
-    serializer_class = resultsOLSSerializer
+class ResultsView(viewsets.ModelViewSet):
+    queryset = Results.objects.all()
+    serializer_class = ResultsSerializer
 
-class ResultsNNLSView(viewsets.ModelViewSet):
-    queryset = ResultsNNLS.objects.all()
-    serializer_class = ResultsNNLSSerializer
-
-
+# class ResultsOLSView(viewsets.ModelViewSet):
+#     queryset = ResultsOLS.objects.all()
+#     serializer_class = resultsOLSSerializer
+#
+# class ResultsNNLSView(viewsets.ModelViewSet):
+#     queryset = ResultsNNLS.objects.all()
+#     serializer_class = ResultsNNLSSerializer
 
 
 def stringToList(string):
@@ -55,6 +57,12 @@ def stringToList(string):
 def stringToDict(string):
     inputString = "{" + string + "}"
     return inputString
+
+def get_checksum(file):
+    hash = hashlib.md5()
+    for chunk in iter(lambda: file.read(4096), b""):
+        hash.update(chunk)
+    return hash.hexdigest()
 
 
 def myform(request):
@@ -71,33 +79,28 @@ def myform(request):
             else:
                 fixed = form.cleaned_data['fixed']
             threshold = form.cleaned_data['threshold']
+            # Use process PID to distinguish data files between instances
             path = settings.TMP_FILES + '/data' + str(os.getpid()) + '.csv'
+            parameters = form.save(commit=False)
             with open(path, 'w+b') as f:
                 f.write(inputFile)
                 f.close()
             data = pd.read_csv(path)
-            form.save()
-            resultOLS, resultNNLS = MLModel.get_data(data, paramList, targetColumn,
+            upload_timestamp = datetime.now()
+            parameters.upload_timestamp = upload_timestamp
+            file_hash = get_checksum(request.FILES['inputFile'])
+            parameters.file_hash = file_hash
+            parameters.save()
+            results = MLModel.get_data(data, paramList, targetColumn,
                               adjust, round, threshold)
-            resultOLS.runid = Parameters.objects.latest('runid')
-            resultNNLS.runid = Parameters.objects.latest('runid')
-            # os.remove(path)
-            resultOLS.save()
-            resultNNLS.save()
-
-
+            results.file_hash = file_hash
+            results.upload_timestamp = upload_timestamp
+            results.runid = Parameters.objects.latest('runid')
+            results.save()
+            os.remove(path)
 
 
 
     form = ParametersForm()
 
     return render(request, 'myform/form.html', {'form': form})
-
-# def result_detail(request, pk):
-#         result_detail_ols = get_object_or_404(ResultsOLS, pk=pk)
-#         result_detail_nnls = get_object_or_404(ResultsNNLS, pk=pk)
-#         content = {
-#             'result_detail_ols': result_detail_ols,
-#             'result_detail_nnls': result_detail_nnls,
-#         }
-#         return render(request, 'results/result_detail.html', context)
