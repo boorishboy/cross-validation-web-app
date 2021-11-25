@@ -8,7 +8,13 @@ class ResultsSerializer(serializers.ModelSerializer):
 		fields = '__all__'
 
 
-class ParametersSerializer(serializers.ModelSerializer):
+class InputSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = Parameters
+		fields = '__all__'
+
+
+class CombinedSerializer(serializers.ModelSerializer):
 	results = ResultsSerializer(read_only=True)
 	class Meta:
 		model=Parameters

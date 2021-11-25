@@ -45,8 +45,8 @@ class Results(models.Model):
     rmsre_ols = models.FloatField(default=None)
     stddev_abs_percentage_error_ols = models.FloatField(default=None)
     stddev_relative_error_ols = models.FloatField(default=None)
-    rmse_ols = models.CharField(max_length=64, default=None)
-    r2_score_ols = models.CharField(max_length=64, default=None)
+    rmse_ols = models.FloatField(default=None)
+    r2_score_ols = models.FloatField(default=None)
     outliers_nnls = models.TextField(default=None)
     mean_abs_percentage_error_nnls = models.FloatField(default=None)
     percentage_error_vect_nnls = models.TextField(default=None)
@@ -55,8 +55,8 @@ class Results(models.Model):
     rmsre_nnls = models.FloatField(default=None)
     stddev_abs_percentage_error_nnls = models.FloatField(default=None)
     stddev_relative_error_nnls = models.FloatField(default=None)
-    rmse_nnls = models.CharField(max_length=64, default=None)
-    r2_score_nnls = models.CharField(max_length=64, default=None)
+    rmse_nnls = models.FloatField(default=None)
+    r2_score_nnls = models.FloatField(default=None)
 
 
 

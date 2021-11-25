@@ -15,13 +15,14 @@ from sklearn.base import clone
 from sklearn.model_selection import cross_val_score
 from . models import Parameters, Results
 import ast
-from datetime import datetime
+from django.utils import timezone
 
 
 NNLS = 0
 OLS = 1
 
 results = Results()
+
 
 def get_mode_name(mode):
     '''Return name of the current mode.'''
@@ -37,7 +38,7 @@ def display_scores(scores):
     # print("Scores: ", scores)
     # print("Mean: ", scores.mean())
     # print("Standard deviation: ", scores.std())
-    return scores, scores.mean(), scores.std()
+    return str(list(scores)), scores.mean(), scores.std()
 
 # df = pd.read_csv("stats_and_modeling/COMBINED/48/1/0/data-HW-and-TL.csv")
 # param_list = ['Executed insns (no MULS)', 'MULS insns', 'Taken branches', 'RAM data reads', 'RAM writes', 'Flash data reads', 'Flash insn reads', 'BL insns', 'PUSH/POP PC/LR']
@@ -47,34 +48,37 @@ def display_scores(scores):
 # threshold = 5.0 / 100
 
 
-def get_data(df, param_list, target_column, adjust, round, threshold):
-
-
+def get_data(df, param_list, target_column, adjust, round, fixed, threshold):
 
     param_list = eval(param_list)
     y = df.loc[:, target_column].values
     # Adjust the regressand.
     if adjust is not None:
         y = y * adjust
-    fixed = "{}"
-    param_value_dict = ast.literal_eval(fixed)
-    fixed_params = param_value_dict.keys()
-    unconstrained_params = []
+    else:
+        pass
+    if fixed is not None:
+        fixed_dict = fixed
+        param_value_dict = ast.literal_eval(fixed_dict)
+        fixed_params = param_value_dict.keys()
+        unconstrained_params = []
 
-    if param_value_dict:
-        for param in param_list:
-            if param in fixed_params and isinstance(param_value_dict[param], numbers.Number):
-                # Subtract the contribution of the param from the Y vector
-                print('')
-                print("Ratio of residual/original")
-                print(
-                    (y - (df.loc[:, param].values * param_value_dict[param])) / y)
-                print('')
-                y = y - (df.loc[:, param].values * param_value_dict[param])
-            else:
-                unconstrained_params.append(param)
-        # Reset param list to the free-running parameters only.
-        param_list = unconstrained_params
+        if param_value_dict:
+            for param in param_list:
+                if param in fixed_params and isinstance(param_value_dict[param], numbers.Number):
+                    # Subtract the contribution of the param from the Y vector
+                    print('')
+                    print("Ratio of residual/original")
+                    print(
+                        (y - (df.loc[:, param].values * param_value_dict[param])) / y)
+                    print('')
+                    y = y - (df.loc[:, param].values * param_value_dict[param])
+                else:
+                    unconstrained_params.append(param)
+            # Reset param list to the free-running parameters only.
+            param_list = unconstrained_params
+        else:
+            pass
     else:
         pass
 
@@ -96,7 +100,8 @@ def get_data(df, param_list, target_column, adjust, round, threshold):
         count = count + 1
 
     scrs_array = np.asarray(scrs)
-    results.rkf_scores, results.rkf_mean, results.rkf_stddev = display_scores(scrs_array)
+    results.rkf_scores, results.rkf_mean, results.rkf_stddev = display_scores(
+        scrs_array)
 
     # Evaluate score by cross validation
     regressor2 = LinearRegression(fit_intercept=False)
@@ -119,7 +124,10 @@ def get_data(df, param_list, target_column, adjust, round, threshold):
     # print(param_list)
     # with np.printoptions(linewidth=200):
     #     print(regressor3.coef_)
-    results.coefs_ols = regressor3.coef_
+    if round is not None:
+        rounded_coefs = np.round(regressor3.coef_, round)
+        
+    results.coefs_ols = str(list(rounded_coefs))
     predicted[OLS] = pred
 
     #print("Coefficients constrained to non-negative values, least-squares method")
@@ -133,14 +141,12 @@ def get_data(df, param_list, target_column, adjust, round, threshold):
     if round is not None:
         res.x = np.round(res.x, round)
 
-
-    results.coefs_nnls = res.x
+    results.coefs_nnls = str(list(res.x))
     predicted[NNLS] = np.dot(x, res.x)
-
 
     for i in [NNLS, OLS]:
         if i == NNLS:
-            results.outliers_nnls = str([(bench, predicted, actual, 100 * (predicted - actual) / actual) if abs(predicted - actual) / actual > threshold else None for (bench, predicted, actual) in zip(df.loc[:, 'Bench'], predicted[i], y)])
+            results.outliers_nnls = str([(bench, predicted, actual, 100 * (predicted - actual) / actual) for (bench, predicted, actual) in zip(df.loc[:, 'Bench'], predicted[i], y) if abs(predicted - actual) / actual > threshold])
 
             # Determine and print mean(abs(relative error)).
             mean_abs_percentage_error = mean_absolute_error(
@@ -154,7 +160,8 @@ def get_data(df, param_list, target_column, adjust, round, threshold):
             mean_percentage_error = (
                 percentage_error_vect).mean() * 100.0
             results.mean_percentage_error_nnls = mean_percentage_error
-            results.percentage_error_vect_nnls = str(list(percentage_error_vect))
+            results.percentage_error_vect_nnls = str(
+                list(percentage_error_vect))
             # print("MEAN(percentage_error_%s) = %.5f%%" %
             #       (get_mode_name(i), mean_percentage_error[i] * 100.0))
 
@@ -182,8 +189,8 @@ def get_data(df, param_list, target_column, adjust, round, threshold):
             mse = mean_squared_error(y, predicted[i])
             rmse = np.sqrt(mse)
             r2 = r2_score(y, predicted[i])
-            results.rmse_nnls = str(rmse)
-            results.r2_score_nnls = str(r2)
+            results.rmse_nnls = rmse
+            results.r2_score_nnls = r2
             # print(("RMSE Score %s:" % get_mode_name(i)) + str(rmse))
             # print(("R2 Score %s:" % get_mode_name(i)) + str(r2_score(y, predicted[i])))
 
@@ -193,7 +200,7 @@ def get_data(df, param_list, target_column, adjust, round, threshold):
             # [print("%s: %.9f, %.9f, %5.2f%%" % elt)
             #  if elt else None for elt in outliers[i]]
         else:
-            results.outliers_ols = str([(bench, predicted, actual, 100 * (predicted - actual) / actual) if abs(predicted - actual) / actual > threshold else None for (bench, predicted, actual) in zip(df.loc[:, 'Bench'], predicted[i], y)])
+            results.outliers_ols = str([(bench, predicted, actual, 100 * (predicted - actual) / actual) for (bench, predicted, actual) in zip(df.loc[:, 'Bench'], predicted[i], y) if abs(predicted - actual) / actual > threshold])
 
             # Determine and print mean(abs(relative error)).
             mean_abs_percentage_error = mean_absolute_error(
@@ -207,7 +214,8 @@ def get_data(df, param_list, target_column, adjust, round, threshold):
             mean_percentage_error = (
                 percentage_error_vect).mean() * 100.0
             results.mean_percentage_error_ols = mean_percentage_error
-            results.percentage_error_vect_ols = str(list(percentage_error_vect))
+            results.percentage_error_vect_ols = str(
+                list(percentage_error_vect))
             # print("MEAN(percentage_error_%s) = %.5f%%" %
             #       (get_mode_name(i), mean_percentage_error[i] * 100.0))
 
@@ -235,8 +243,8 @@ def get_data(df, param_list, target_column, adjust, round, threshold):
             mse = mean_squared_error(y, predicted[i])
             rmse = np.sqrt(mse)
             r2 = r2_score(y, predicted[i])
-            results.rmse_ols = str(rmse)
-            results.r2_score_ols = str(r2)
+            results.rmse_ols = rmse
+            results.r2_score_ols = r2
             # print(("RMSE Score %s:" % get_mode_name(i)) + str(rmse))
             # print(("R2 Score %s:" % get_mode_name(i)) + str(r2_score(y, predicted[i])))
 
@@ -245,5 +253,5 @@ def get_data(df, param_list, target_column, adjust, round, threshold):
             # print("=================================================")
             # [print("%s: %.9f, %.9f, %5.2f%%" % elt)
             #  if elt else None for elt in outliers[i]]
-    results.results_timestamp = datetime.now()
+    results.results_timestamp = timezone.now()
     return results

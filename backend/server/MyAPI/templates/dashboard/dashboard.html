@@ -1,16 +1,103 @@
 {% extends 'base.html' %}
-
-<script>
+{% load static %}
+{% load MyAPI_extras %}
 {% block jquery %}
+<script src="{% static '/js/makeplots.js' %}"></script>
+<script src="{% static '/js/dashboard.js' %}"></script>
 {% endblock %}
-</script>
 
 {% block content %}
+<div class='container-fluid'>
+  <div class='row row-m-t'>
+    <div class="col-12 center-block">
 
-<div class='row'>
-  <div class="col-sm-12">
-    <h1>Hello, World!</h1>
+      <h1>Hello, World!</h1>
+      <select class="form-select form-select-sm" aria-label=".form-select-sm example">
+        <option selected>Open this select menu</option>
+        {% for p in parameters %}
+        <option value='{{p.runid}}'>{{ p.runid|addstr:" "|addstr:p.targetColumn|addstr:" "|addstr:p.upload_timestamp }}</option>
+        {% endfor %}
+      </select>
+
+    </div>
+  </div>
+  <div class="row row-m-t">
+    <div class="col-4">
+      <ul class="nav nav-tabs" id="params-tab" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#input-params" type="button" role="tab" aria-controls="input-params" aria-selected="true">Input Parameters</button>
+        </li>
+      </ul>
+      <div class="tab-content" id="myTabContent">
+        <div class="tab-pane show active" id="input-params" role="tabpanel" aria-labelledby="input-params-tab">
+          <div class="container-fluid container-0padding">
+            <div class="col-12">
+              <table id="parameters-table" class="table table-hover">
+                <tbody>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-8">
+      <ul class="nav nav-tabs" id="results-tab" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="data-val-tab" data-bs-toggle="tab" data-bs-target="#data-validation" type="button" role="tab" aria-controls="data-validation" aria-selected="true">Data Validation</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="result-ols-tab" data-bs-toggle="tab" data-bs-target="#results-ols" type="button" role="tab" aria-controls="results-ols" aria-selected="false">Results OLS</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="results-nnls-tab" data-bs-toggle="tab" data-bs-target="#results-nnls" type="button" role="tab" aria-controls="results-nnls" aria-selected="false">Results NNLS</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#charts" type="button" role="tab" aria-controls="charts" aria-selected="false">Charts</button>
+        </li>
+      </ul>
+      <div class="tab-content" id="myTabContent">
+        <div class="tab-pane show active" id="data-validation" role="tabpanel" aria-labelledby="data-val-tab">
+          <div class="container-fluid container-0padding">
+            <div class="col-12">
+              <div class="row">
+                <table id="data-val-table" class="table table-hover">
+                  <tbody>
+                  </tbody>
+                </table>
+              </div>
+              <div class="row">
+                <div id='data-val-rkf-plot'>
+                </div>
+                <!-- <canvas id="data-val-rkf"></canvas>
+          <canvas id="data-val-cv"></canvas> -->
+              </div>
+              <div class="row">
+                <div id="data-val-cv-plot"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      <div class="tab-pane" id="results-ols" role="tabpanel" aria-labelledby="results-ols-tab">
+        <table id="results-ols-table" class="table table-hover">
+          <tbody>
+          </tbody>
+        </table>
+      </div>
+      <div class="tab-pane" id="results-nnls" role="tabpanel" aria-labelledby="results-nnls-tab">
+        <table id="results-nnls-table" class="table table-hover">
+          <tbody>
+          </tbody>
+        </table>
+      </div>
+      <div class="tab-pane" id="charts" role="tabpanel" aria-labelledby="charts-tab">
+
+      </div>
+    </div>
   </div>
 </div>
+
+</div>
+
 
 {% endblock content %}

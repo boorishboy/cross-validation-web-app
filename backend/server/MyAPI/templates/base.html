@@ -8,15 +8,16 @@
     {% include 'base/css.html' %}
   </head>
   <body>
-    <div class='container'>
+    <nav class="navbar navbar-dark" style="background-color: #9270ff">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/">Catchy</a>
+      </div>
+    </nav>
       {% block content %}
       {% endblock content %}
     </div>
     {% include 'base/js.html' %}
-    <script>
-    $(document).ready(function(){
-      {% block jquery %}{% endblock %}
-    })
-    </script>
+    {% block jquery %}
+    {% endblock %}
   </body>
 </html>

@@ -4,7 +4,7 @@ from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.core import serializers
-from . serializers import ParametersSerializer, ResultsSerializer
+from . serializers import InputSerializer, ResultsSerializer, CombinedSerializer
 from . models import Parameters, Results
 from . forms import ParametersForm
 import pandas as pd
@@ -14,39 +14,17 @@ from collections import namedtuple
 from django.shortcuts import redirect, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.utils import timezone
 from datetime import datetime
 import os
 import hashlib
+import json
 # Create your views here.
 
 
-class HomeView(View):
-    def get(self, request, *args, **kwargs):
-        return render(request, 'index.html', {})
-
-class DashboardView(View):
-    def get(self, request, *args, **kwargs):
-        return render(request, 'dashboard/dashboard.html', {})
-
-class ParametersView(viewsets.ModelViewSet):
-    queryset = Parameters.objects.all()
-    serializer_class = ParametersSerializer
-
-class ResultDetailView(View):
-    def get(self, request, *args, **kwargs):
-        return render(request, 'results/result_detail.html', {})
-
-class ResultsView(viewsets.ModelViewSet):
-    queryset = Results.objects.all()
-    serializer_class = ResultsSerializer
-
-# class ResultsOLSView(viewsets.ModelViewSet):
-#     queryset = ResultsOLS.objects.all()
-#     serializer_class = resultsOLSSerializer
-#
-# class ResultsNNLSView(viewsets.ModelViewSet):
-#     queryset = ResultsNNLS.objects.all()
-#     serializer_class = ResultsNNLSSerializer
+def columnsToCheckboxes(file):
+    col_list = pd.read_csv(file, index_col=0, nrows=0).columns.tolist()
+    col_response = json.dumps(col_list)
 
 
 def stringToList(string):
@@ -65,7 +43,7 @@ def get_checksum(file):
     return hash.hexdigest()
 
 
-def myform(request):
+def input(request):
     if request.method == 'POST':
         form = ParametersForm(request.POST, request.FILES)
         if form.is_valid():
@@ -86,21 +64,84 @@ def myform(request):
                 f.write(inputFile)
                 f.close()
             data = pd.read_csv(path)
-            upload_timestamp = datetime.now()
+            upload_timestamp = timezone.now()
             parameters.upload_timestamp = upload_timestamp
             file_hash = get_checksum(request.FILES['inputFile'])
             parameters.file_hash = file_hash
             parameters.save()
             results = MLModel.get_data(data, paramList, targetColumn,
-                              adjust, round, threshold)
+                              adjust, round, fixed, threshold)
             results.file_hash = file_hash
             results.upload_timestamp = upload_timestamp
             results.runid = Parameters.objects.latest('runid')
             results.save()
             os.remove(path)
-
+            return redirect('results/result_detail.html')
 
 
     form = ParametersForm()
 
     return render(request, 'myform/form.html', {'form': form})
+
+
+class HomeView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'index.html', {})
+
+class DashboardView(View):
+    def get(self, request, *args, **kwargs):
+        parameters = Parameters.objects.all()
+        return render(request, 'dashboard/dashboard.html', {'parameters': parameters})
+
+class CombinedView(viewsets.ModelViewSet):
+    queryset = Parameters.objects.all()
+    serializer_class = CombinedSerializer
+
+class InputView(viewsets.ModelViewSet):
+    queryset = Parameters.objects.all()
+    serializer_class = InputSerializer
+
+    # def create(self, request, *args, **kwargs):
+    #     serializer = self.get_serializer(data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+    #     self.perform_create()
+
+
+    def perform_create(self, serializer):
+        upload_timestamp = timezone.now()
+        inputFile = self.request.FILES['inputFile'].read()
+        paramList = stringToList(serializer.validated_data['paramList'])
+        targetColumn = serializer.validated_data['targetColumn']
+        try:
+            adjust = serializer.validated_data['adjust']
+        except KeyError:
+            adjust = None
+        round = serializer.validated_data['round']
+        try:
+            fixed = stringToDict(serializer.validated_data['fixed'])
+        except KeyError:
+            fixed = None
+        threshold = serializer.validated_data['threshold']
+        path = settings.TMP_FILES + '/data' + str(os.getpid()) + '.csv'
+        with open(path, 'w+b') as f:
+            f.write(inputFile)
+            f.close()
+        data = pd.read_csv(path)
+        results = MLModel.get_data(data, paramList, targetColumn,
+                          adjust, round, fixed, threshold)
+        file_hash = get_checksum(self.request.FILES['inputFile'])
+        results.file_hash = file_hash
+        results.upload_timestamp = upload_timestamp
+        serializer.save(file_hash=file_hash, upload_timestamp=upload_timestamp)
+        results.runid = Parameters.objects.latest('runid')
+        results.save()
+
+class ResultsView(viewsets.ModelViewSet):
+    queryset = Results.objects.all()
+    serializer_class = ResultsSerializer
+
+class ResultDetailView(View):
+    def get(self, request, *args, **kwargs):
+        parameters = get_object_or_404(Parameters, runid=kwargs['pk'])
+        results = get_object_or_404(Results, runid=kwargs['pk'])
+        return render(request, 'results/result_detail.html', {'parameters': parameters, 'results': results})
