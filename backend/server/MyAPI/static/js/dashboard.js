@@ -7,7 +7,7 @@ $(document).ready(function() {
 
   function truncateContent(string) {
     if (string.includes(", ")) {
-      var list = string.split(",")
+      var list = string.replace(/[\[\]']+/g, '').split(",");
       if (list.length > 10) {
         var slicedArray = list.slice(0, 10);
         return slicedArray;
@@ -15,7 +15,8 @@ $(document).ready(function() {
         return list;
       }
     } else {
-      var list = string.split(" ")
+      string.replace(/[\[\]']+/g, '');
+      var list = string.replace(/[\[\]']+/g, '').split(" ");
       if (list.length > 10) {
         var slicedArray = list.slice(0, 10);
         return slicedArray;
@@ -144,9 +145,9 @@ $(document).ready(function() {
               $.each(data.results, function(i, item) {
                 if (dataValScores.includes(i)) {
                   var keyDataVal = i;
-                  
-                  var valueDataVal = () => (typeof(item)=="string") ? item.replace(/[\[\]']+/g, '') : item;
-                  var valueDataVal = item;
+
+                  var valueDataVal = (typeof(item) == 'string') ? item.replace(/[\[\]']+/g, '') : item;
+                  // var valueDataVal = item;
                   // } else if (i == "resultid" || valuesToPass.includes(i)) {
                   //   var keyDataVal = i;
                   //   var valueDataVal = item;
@@ -173,7 +174,7 @@ $(document).ready(function() {
                       var valueOls = truncateContent(item);
                     }
                   } else {
-                    var valueOls = item;
+                    var valueOls = (typeof(item) == 'string') ? item.replace(/[\[\]']+/g, '') : item;
                   }
                   resultOlsTableBody.append(
                     "<tr>" +
@@ -194,7 +195,7 @@ $(document).ready(function() {
                       var valueNnls = truncateContent(item);
                     }
                   } else {
-                    var valueNnls = item;
+                    var valueNnls = (typeof(item) == 'string') ? item.replace(/[\[\]']+/g, '') : item;
                   }
                   resultNnlsTableBody.append(
                     "<tr>" +
