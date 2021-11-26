@@ -58,10 +58,10 @@ $(document).ready(function() {
       dataType: "json",
       success: (data) => {
 
-        // var dataRKF = data.results.rkf_scores.replace(/[\[\]']+/g, '').split(", ");
-        // dataRKF = dataRKF.map(numStr => parseFloat(numStr));
-        // var dataCV = data.results.cv_scores.replace(/[\[\]']+/g, '').split(", ");
-        // dataCV = dataCV.map(numStr => parseFloat(numStr));
+        var dataRKF = data.results.rkf_scores.replace(/[\[\]']+/g, '').split(", ");
+        dataRKF = dataRKF.map(numStr => parseFloat(numStr));
+        var dataCV = data.results.cv_scores.replace(/[\[\]']+/g, '').split(", ");
+        dataCV = dataCV.map(numStr => parseFloat(numStr));
         // if (RKFChart) {
         //   RKFChart.destroy();
         // } else {
@@ -144,6 +144,8 @@ $(document).ready(function() {
               $.each(data.results, function(i, item) {
                 if (dataValScores.includes(i)) {
                   var keyDataVal = i;
+                  
+                  var valueDataVal = () => (typeof(item)=="string") ? item.replace(/[\[\]']+/g, '') : item;
                   var valueDataVal = item;
                   // } else if (i == "resultid" || valuesToPass.includes(i)) {
                   //   var keyDataVal = i;
@@ -207,8 +209,7 @@ $(document).ready(function() {
           } else {
 
           }
-          // plotRKF(dataRKF, data);
-          // plotCV(dataCV, data);
+
 
           // var trace1 = {
           //   x: getLabels(dataRKF),
@@ -266,6 +267,8 @@ $(document).ready(function() {
           //
           // Plotly.newPlot('data-val-rkf-plot', data1, layout, config);
         });
+        plotRKF(dataRKF, data);
+        plotCV(dataCV, data);
       },
       error: (error) => {
         console.log(error);

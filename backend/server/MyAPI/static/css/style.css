@@ -2,14 +2,13 @@ body {
   font-family: 'Roboto', sans-serif;
 }
 
-
 div.form-group {
   margin-top: 15px;
   margin-bottom: 15px;
 }
 
 .row-m-t {
-  margin-top : 20px;
+  margin-top: 20px;
 }
 
 /* .tab-pane {
@@ -32,9 +31,10 @@ overflow: auto;
 .table-wrapper-scroll-y-results {
 display: block;
 } */
-
 .container-0padding {
   padding: 12px;
-  height: 77vh;
+  height: -o-calc(100% - 65px); /* opera */
+  height: -webkit-calc(100% - 65px); /* google, safari */
+  height: -moz-calc(100% - 65px); /* firefox */
   overflow-y: auto;
 }

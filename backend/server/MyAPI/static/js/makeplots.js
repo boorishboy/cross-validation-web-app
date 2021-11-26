@@ -90,6 +90,10 @@ function plotRKF(dataRKF, data) {
   var config = {
     locale: 'pl',
     responsive: true,
+    toImageButtonOptions: {
+        filename: 'CV_Scores',
+        format: 'png'
+    }
   };
 
 
@@ -148,6 +152,10 @@ function plotCV(dataCV, data) {
   var config = {
     locale: 'pl',
     responsive: true,
+    toImageButtonOptions: {
+        filename: 'CV_Scores',
+        format: 'png'
+    }
   };
 
 
