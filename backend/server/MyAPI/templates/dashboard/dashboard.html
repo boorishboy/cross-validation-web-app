@@ -53,7 +53,7 @@
           <button class="nav-link" id="results-nnls-tab" data-bs-toggle="tab" data-bs-target="#results-nnls" type="button" role="tab" aria-controls="results-nnls" aria-selected="false">Results NNLS</button>
         </li>
         <li class="nav-item" role="presentation">
-          <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#charts" type="button" role="tab" aria-controls="charts" aria-selected="false">Charts</button>
+          <button class="nav-link" id="raw-data-tab" data-bs-toggle="tab" data-bs-target="#raw-data" type="button" role="tab" aria-controls="raw-data" aria-selected="false">Raw Data</button>
         </li>
       </ul>
       <div class="tab-content" id="myTabContent">
@@ -90,8 +90,15 @@
           </tbody>
         </table>
       </div>
-      <div class="tab-pane" id="charts" role="tabpanel" aria-labelledby="charts-tab">
-
+      <div class="tab-pane" id="raw-data" role="tabpanel" aria-labelledby="raw-data-tab">
+        <div class="container-fluid">
+          <div class="col-12">
+            <pre>
+              <code id="json-data">
+              </code>
+            </pre>
+          </div>
+        </div>
       </div>
     </div>
   </div>

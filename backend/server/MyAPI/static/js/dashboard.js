@@ -63,58 +63,14 @@ $(document).ready(function() {
         dataRKF = dataRKF.map(numStr => parseFloat(numStr));
         var dataCV = data.results.cv_scores.replace(/[\[\]']+/g, '').split(", ");
         dataCV = dataCV.map(numStr => parseFloat(numStr));
-        // if (RKFChart) {
-        //   RKFChart.destroy();
-        // } else {
-        //   var ctx = document.getElementById('data-val-rkf').getContext('2d');
-        //   var RKFChart = new Chart(ctx, {
-        //     type: 'bar',
-        //     data: {
-        //       labels: getLabelNumbers(dataRKF),
-        //       datasets: [{
-        //         label: 'RKF Score',
-        //         data: dataRKF,
-        //         backgroundColor: [
-        //           'rgba(255, 99, 132, 0.2)',
-        //           'rgba(54, 162, 235, 0.2)',
-        //           'rgba(255, 206, 86, 0.2)',
-        //           'rgba(75, 192, 192, 0.2)',
-        //           'rgba(153, 102, 255, 0.2)',
-        //           'rgba(255, 159, 64, 0.2)'
-        //         ],
-        //         borderColor: [
-        //           'rgba(255, 99, 132, 1)',
-        //           'rgba(54, 162, 235, 1)',
-        //           'rgba(255, 206, 86, 1)',
-        //           'rgba(75, 192, 192, 1)',
-        //           'rgba(153, 102, 255, 1)',
-        //           'rgba(255, 159, 64, 1)'
-        //         ],
-        //         borderWidth: 1
-        //       }]
-        //     },
-        //     options: {
-        //       locale: 'pl-PL',
-        //       tooltips: {
-        //         mode: 'index',
-        //         intersect: false
-        //       },
-        //       scales: {
-        //         y: {
-        //           beginAtZero: true
-        //         }
-        //       }
-        //     }
-        //   });
-        // }
-
-
 
 
         var paramTableBody = $("#parameters-table tbody")
         var resultOlsTableBody = $("#results-ols-table tbody")
         var resultNnlsTableBody = $("#results-nnls-table tbody")
         var dataValTableBody = $("#data-val-table tbody")
+        var jsonData = $("#json-data")
+        jsonData.append(JSON.stringify(data, null, 2));
         paramTableBody.empty();
         resultOlsTableBody.empty();
         resultNnlsTableBody.empty();
