@@ -31,8 +31,19 @@ overflow: auto;
 .table-wrapper-scroll-y-results {
 display: block;
 } */
-.container-0padding {
+.container-12padding {
   padding: 12px;
   height: 77vh;
   overflow-y: auto;
 }
+
+pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; }
+.string { color: green; }
+.number { color: darkblue; }
+.boolean { color: blue; }
+.null { color: magenta; }
+.key { color: darkred; }
+
+/* .btn#json-download {
+  float: right;
+} */

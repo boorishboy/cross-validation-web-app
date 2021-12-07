@@ -10,6 +10,7 @@ $(document).ready(function() {
       var list = string.replace(/[\[\]']+/g, '').split(",");
       if (list.length > 10) {
         var slicedArray = list.slice(0, 10);
+        slicedArray.push(" ...");
         return slicedArray;
       } else {
         return list;
@@ -19,6 +20,7 @@ $(document).ready(function() {
       var list = string.replace(/[\[\]']+/g, '').split(" ");
       if (list.length > 10) {
         var slicedArray = list.slice(0, 10);
+        slicedArray.push(" ...");
         return slicedArray;
       } else {
         return list;
@@ -26,29 +28,38 @@ $(document).ready(function() {
     }
   }
 
-  // function getLabels(array) {
-  //   var xlables = [];
-  //   for (let i = 1; i - 1 < array.length; i++) {
-  //     xlables.push(i.toString())
-  //   }
-  //   return xlables;
-  // }
-  //
-  // function getErrorArray(array, data) {
-  //   var errorArray = [];
-  //   for (let i = 0; i < array.length; i++) {
-  //     errorArray.push(data.results.rkf_stddev)
-  //   }
-  //   return errorArray;
-  // }
-  //
-  // function getMeanArray(array, data) {
-  //   var meanArray = [];
-  //   for (let i = 0; i < array.length; i++) {
-  //     meanArray.push(data.results.rkf_mean)
-  //   }
-  //   return meanArray;
-  // }
+  function syntaxHighlight(json) {
+    json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function(match) {
+      var cls = 'number';
+      if (/^"/.test(match)) {
+        if (/:$/.test(match)) {
+          cls = 'key';
+        } else {
+          cls = 'string';
+        }
+      } else if (/true|false/.test(match)) {
+        cls = 'boolean';
+      } else if (/null/.test(match)) {
+        cls = 'null';
+      }
+      return '<span class="' + cls + '">' + match + '</span>';
+    });
+  }
+
+  function download(content, fileName, contentType) {
+    const a = document.createElement("a");
+    const file = new Blob([content], {
+      type: contentType
+    });
+    a.href = URL.createObjectURL(file);
+    a.download = fileName;
+    a.click();
+  }
+
+
+
+
 
 
   $('select').change(function() {
@@ -63,14 +74,19 @@ $(document).ready(function() {
         dataRKF = dataRKF.map(numStr => parseFloat(numStr));
         var dataCV = data.results.cv_scores.replace(/[\[\]']+/g, '').split(", ");
         dataCV = dataCV.map(numStr => parseFloat(numStr));
-
-
+        var dataCoefsOLS = data.results.coefs_ols.replace(/[\[\]']+/g, '').split(", ");
+        dataCoefsOLS = dataCoefsOLS.map(numStr => parseFloat(numStr));
+        var dataCoefsOLS = data.results.coefs_ols.replace(/[\[\]']+/g, '').split(", ");
+        dataCoefsOLS = dataCoefsOLS.map(numStr => parseFloat(numStr));
         var paramTableBody = $("#parameters-table tbody")
         var resultOlsTableBody = $("#results-ols-table tbody")
         var resultNnlsTableBody = $("#results-nnls-table tbody")
         var dataValTableBody = $("#data-val-table tbody")
-        var jsonData = $("#json-data")
-        jsonData.append(JSON.stringify(data, null, 2));
+        var jsonDiv = $('#json-data')
+        var jsonString = JSON.stringify(data, null, 4);
+        jsonDiv.empty();
+        jsonDiv.append(syntaxHighlight(jsonString));
+        $("#json-download").click(function () {download(JSON.stringify(data, null, 4), data.runid.toString() + "_" + data.targetColumn + "_" + data.upload_timestamp + ".json", "text/json"); });
         paramTableBody.empty();
         resultOlsTableBody.empty();
         resultNnlsTableBody.empty();
@@ -94,6 +110,7 @@ $(document).ready(function() {
               "<td>" + value + "</td>" +
               "</tr>"
             );
+
           } else if (i == 'results') {
             var valuesToPass = ["upload_timestamp", "file_hash", "runid"]
             var dataValScores = ["rkf_mean", "rkf_scores", "rkf_stddev", "cv_mean", "cv_scores", "cv_stddev"]
@@ -112,9 +129,10 @@ $(document).ready(function() {
                   dataValTableBody.append(
                     "<tr>" +
                     "<th>" + keyDataVal + "</th>" +
-                    "<td>" + valueDataVal + "</td>" +
+                    "<td data-toggle='tooltip' data-placement='top' title='Full data in Raw Data tab'>" + valueDataVal + "</td>" +
                     "</tr>"
                   );
+
                 } else if (valuesToPass.includes(i)) {
                   return true;
                 } else if (i.includes("ols")) {
@@ -135,7 +153,7 @@ $(document).ready(function() {
                   resultOlsTableBody.append(
                     "<tr>" +
                     "<th>" + keyOls + "</th>" +
-                    "<td>" + valueOls + "</td>" +
+                    "<td data-toggle='tooltip' data-placement='top' title='Full data in Raw Data tab'>" + valueOls + "</td>" +
                     "</tr>"
                   );
                 } else if (i.includes("nnls")) {
@@ -156,7 +174,7 @@ $(document).ready(function() {
                   resultNnlsTableBody.append(
                     "<tr>" +
                     "<th>" + keyNnls + "</th>" +
-                    "<td>" + valueNnls + "</td>" +
+                    "<td data-toggle='tooltip' data-placement='top' title='Full data in Raw Data tab'>" + valueNnls + "</td>" +
                     "</tr>"
                   );
                 }
@@ -166,66 +184,12 @@ $(document).ready(function() {
           } else {
 
           }
-
-
-          // var trace1 = {
-          //   x: getLabels(dataRKF),
-          //   y: dataRKF,
-          //   name: 'RKF Scores',
-          //   error_y: {
-          //     type: 'data',
-          //     array: getErrorArray(dataRKF, data),
-          //     visible: true
-          //   },
-          //   type: 'bar'
-          // };
-          // var trace2 = {
-          //   x: getLabels(dataRKF),
-          //   y: getMeanArray(dataRKF, data),
-          //   name: 'Mean',
-          //   type: 'line'
-          // };
-          // var data1 = [trace1, trace2];
-          // var layout = {
-          //   title: 'RepeatedKFold Scores',
-          //   titlefont: {
-          //     family: 'Roboto',
-          //     size: 18,
-          //   },
-          //   xaxis: {
-          //     'type': 'category',
-          //     title: 'Number of Fold',
-          //     titlefont: {
-          //       family: 'Roboto',
-          //       size: 18,
-          //       color: 'lightgrey'
-          //     }
-          //   },
-          //   autosize: true,
-          //   // shapes: [{
-          //   //     type: 'line',
-          //   //     x0: 1,
-          //   //     y0: 0,
-          //   //     x1: 1,
-          //   //     y1: 2,
-          //   //     line: {
-          //   //       color: 'rgb(55, 128, 191)',
-          //   //       width: 3
-          //   //     }
-          //   //   }
-          //   // ]
-          // };
-          // var config = {
-          //   locale: 'pl',
-          //   responsive: true,
-          // };
-          //
-          //
-          //
-          // Plotly.newPlot('data-val-rkf-plot', data1, layout, config);
         });
         plotRKF(dataRKF, data);
         plotCV(dataCV, data);
+        $("td").tooltip({
+          container: 'body'
+        });
       },
       error: (error) => {
         console.log(error);

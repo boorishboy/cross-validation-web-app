@@ -22,7 +22,7 @@ NNLS = 0
 OLS = 1
 
 results = Results()
-
+np.set_printoptions(suppress=True)
 
 def get_mode_name(mode):
     '''Return name of the current mode.'''
@@ -34,11 +34,11 @@ def get_file_label(mode):
     return ('Energy' if 'Energy' in mode else 'Cycles')
 
 
-def display_scores(scores):
+def display_scores(scores, round):
     # print("Scores: ", scores)
     # print("Mean: ", scores.mean())
     # print("Standard deviation: ", scores.std())
-    return str(list(scores)), scores.mean(), scores.std()
+    return str([np.round(num, round) for num in list(scores)]), np.round(scores.mean(), round), np.round(scores.std(), round)
 
 # df = pd.read_csv("stats_and_modeling/COMBINED/48/1/0/data-HW-and-TL.csv")
 # param_list = ['Executed insns (no MULS)', 'MULS insns', 'Taken branches', 'RAM data reads', 'RAM writes', 'Flash data reads', 'Flash insn reads', 'BL insns', 'PUSH/POP PC/LR']
@@ -101,7 +101,7 @@ def get_data(df, param_list, target_column, adjust, round, fixed, threshold):
 
     scrs_array = np.asarray(scrs)
     results.rkf_scores, results.rkf_mean, results.rkf_stddev = display_scores(
-        scrs_array)
+        scrs_array, round)
 
     # Evaluate score by cross validation
     regressor2 = LinearRegression(fit_intercept=False)
@@ -111,7 +111,7 @@ def get_data(df, param_list, target_column, adjust, round, fixed, threshold):
         rmse_scores = np.sqrt(-scores)
     except:
         print("### np.sqrt(-scores) failed, scores = " + str(scores))
-    results.cv_scores, results.cv_mean, results.cv_stddev = display_scores(rmse_scores)
+    results.cv_scores, results.cv_mean, results.cv_stddev = display_scores(rmse_scores, round)
 
     coefs = [None] * 2
     predicted = [None] * 2
@@ -126,7 +126,7 @@ def get_data(df, param_list, target_column, adjust, round, fixed, threshold):
     #     print(regressor3.coef_)
     if round is not None:
         rounded_coefs = np.round(regressor3.coef_, round)
-        
+
     results.coefs_ols = str(list(rounded_coefs))
     predicted[OLS] = pred
 
@@ -143,54 +143,47 @@ def get_data(df, param_list, target_column, adjust, round, fixed, threshold):
 
     results.coefs_nnls = str(list(res.x))
     predicted[NNLS] = np.dot(x, res.x)
-
     for i in [NNLS, OLS]:
         if i == NNLS:
             results.outliers_nnls = str([(bench, predicted, actual, 100 * (predicted - actual) / actual) for (bench, predicted, actual) in zip(df.loc[:, 'Bench'], predicted[i], y) if abs(predicted - actual) / actual > threshold])
 
             # Determine and print mean(abs(relative error)).
-            mean_abs_percentage_error = mean_absolute_error(
-                y / y, predicted[i] / y) * 100.0
+            mean_abs_percentage_error = np.round(mean_absolute_error(
+                y / y, predicted[i] / y) * 100.0, round)
             results.mean_abs_percentage_error_nnls = mean_abs_percentage_error
-            # print("MAPE_%s = %.5f%%" %
-            #       (get_mode_name(i), mean_abs_percentage_error[i] * 100.0))
 
             # Determine and print mean(percentage error).
             percentage_error_vect = predicted[i] / y - y / y
-            mean_percentage_error = (
-                percentage_error_vect).mean() * 100.0
+            mean_percentage_error = (percentage_error_vect).mean() * 100.0
             results.mean_percentage_error_nnls = mean_percentage_error
-            results.percentage_error_vect_nnls = str(
-                list(percentage_error_vect))
-            # print("MEAN(percentage_error_%s) = %.5f%%" %
-            #       (get_mode_name(i), mean_percentage_error[i] * 100.0))
+            results.percentage_error_vect_nnls = str([np.round(num, round+5) for num in list(percentage_error_vect)])
 
             # Determine and print the median error.
-            results.median_percentage_error_nnls = np.median(
-                percentage_error_vect) * 100.0
+            results.median_percentage_error_nnls = np.round(np.median(
+                percentage_error_vect) * 100.0, round)
             # print("MEDIAN(percentage_error_%s) = %.5f%%" %
             #       (get_mode_name(i), median_percentage_error[i] * 100.0))
 
             # Determine and print root of mean square relative error.
             mean_squared_RE = mean_squared_error(y / y, predicted[i] / y)
-            results.rmsre_nnls = np.sqrt(mean_squared_RE) * 100.0
+            results.rmsre_nnls = np.round(np.sqrt(mean_squared_RE) * 100.0, round)
             # print("rootMSRE_%s = %.5f%%" % (get_mode_name(i), rmsre[i] * 100.0))
 
-            results.stddev_abs_percentage_error_nnls = np.sqrt(mean_squared_error(np.full(
-                y.shape, mean_abs_percentage_error), predicted[i] / y - np.full(y.shape, 1.0))) * 100.0
+            results.stddev_abs_percentage_error_nnls = np.round(np.sqrt(mean_squared_error(np.full(
+                y.shape, mean_abs_percentage_error), predicted[i] / y - np.full(y.shape, 1.0))) * 100.0, round)
             # print("STDDEV(MAPE_%s) = %.5f%%" %
             #       (get_mode_name(i), stddev_abs_percentage_error[i] * 100.0))
 
-            results.stddev_relative_error_nnls = np.sqrt(mean_squared_error(np.full(
-                y.shape, mean_percentage_error), predicted[i] / y - np.full(y.shape, 1.0))) * 100.0
+            results.stddev_relative_error_nnls = np.round(np.sqrt(mean_squared_error(np.full(
+                y.shape, mean_percentage_error), predicted[i] / y - np.full(y.shape, 1.0))) * 100.0, round)
             # print("STDDEV(percentage_error_%s) = %.5f%%" %
             #       (get_mode_name(i), stddev_relative_error[i] * 100.0))
 
             mse = mean_squared_error(y, predicted[i])
             rmse = np.sqrt(mse)
             r2 = r2_score(y, predicted[i])
-            results.rmse_nnls = rmse
-            results.r2_score_nnls = r2
+            results.rmse_nnls = np.round(rmse, round)
+            results.r2_score_nnls = np.round(r2, round)
             # print(("RMSE Score %s:" % get_mode_name(i)) + str(rmse))
             # print(("R2 Score %s:" % get_mode_name(i)) + str(r2_score(y, predicted[i])))
 
@@ -203,48 +196,48 @@ def get_data(df, param_list, target_column, adjust, round, fixed, threshold):
             results.outliers_ols = str([(bench, predicted, actual, 100 * (predicted - actual) / actual) for (bench, predicted, actual) in zip(df.loc[:, 'Bench'], predicted[i], y) if abs(predicted - actual) / actual > threshold])
 
             # Determine and print mean(abs(relative error)).
-            mean_abs_percentage_error = mean_absolute_error(
-                y / y, predicted[i] / y) * 100.0
-            results.mean_abs_percentage_error_ols = mean_abs_percentage_error
+            mean_abs_percentage_error = np.round(mean_absolute_error(
+                y / y, predicted[i] / y) * 100.0, round)
+            results.mean_abs_percentage_error_ols = np.round(mean_abs_percentage_error, round)
             # print("MAPE_%s = %.5f%%" %
             #       (get_mode_name(i), mean_abs_percentage_error[i] * 100.0))
 
             # Determine and print mean(percentage error).
             percentage_error_vect = predicted[i] / y - y / y
+
             mean_percentage_error = (
                 percentage_error_vect).mean() * 100.0
-            results.mean_percentage_error_ols = mean_percentage_error
-            results.percentage_error_vect_ols = str(
-                list(percentage_error_vect))
+            results.mean_percentage_error_ols = np.round(mean_percentage_error, round)
+            results.percentage_error_vect_ols = str([np.round(num, round+5) for num in list(percentage_error_vect)])
             # print("MEAN(percentage_error_%s) = %.5f%%" %
             #       (get_mode_name(i), mean_percentage_error[i] * 100.0))
 
             # Determine and print the median error.
-            results.median_percentage_error_ols = np.median(
-                percentage_error_vect) * 100.0
+            results.median_percentage_error_ols = np.round(np.median(
+                percentage_error_vect) * 100.0, round)
             # print("MEDIAN(percentage_error_%s) = %.5f%%" %
             #       (get_mode_name(i), median_percentage_error[i] * 100.0))
 
             # Determine and print root of mean square relative error.
             mean_squared_RE = mean_squared_error(y / y, predicted[i] / y)
-            results.rmsre_ols = np.sqrt(mean_squared_RE) * 100.0
+            results.rmsre_ols = np.round(np.sqrt(mean_squared_RE) * 100.0, round)
             # print("rootMSRE_%s = %.5f%%" % (get_mode_name(i), rmsre[i] * 100.0))
 
-            results.stddev_abs_percentage_error_ols = np.sqrt(mean_squared_error(np.full(
-                y.shape, mean_abs_percentage_error), predicted[i] / y - np.full(y.shape, 1.0))) * 100.0
+            results.stddev_abs_percentage_error_ols = np.round(np.sqrt(mean_squared_error(np.full(
+                y.shape, mean_abs_percentage_error), predicted[i] / y - np.full(y.shape, 1.0))) * 100.0, round)
             # print("STDDEV(MAPE_%s) = %.5f%%" %
             #       (get_mode_name(i), stddev_abs_percentage_error[i] * 100.0))
 
-            results.stddev_relative_error_ols = np.sqrt(mean_squared_error(np.full(
-                y.shape, mean_percentage_error), predicted[i] / y - np.full(y.shape, 1.0))) * 100.0
+            results.stddev_relative_error_ols = np.round(np.sqrt(mean_squared_error(np.full(
+                y.shape, mean_percentage_error), predicted[i] / y - np.full(y.shape, 1.0))) * 100.0, round)
             # print("STDDEV(percentage_error_%s) = %.5f%%" %
             #       (get_mode_name(i), stddev_relative_error[i] * 100.0))
 
             mse = mean_squared_error(y, predicted[i])
             rmse = np.sqrt(mse)
             r2 = r2_score(y, predicted[i])
-            results.rmse_ols = rmse
-            results.r2_score_ols = r2
+            results.rmse_ols = np.round(rmse, round)
+            results.r2_score_ols = np.round(r2, round)
             # print(("RMSE Score %s:" % get_mode_name(i)) + str(rmse))
             # print(("R2 Score %s:" % get_mode_name(i)) + str(r2_score(y, predicted[i])))
 
