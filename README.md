@@ -13,7 +13,7 @@
 ```source venv/bin/activate```
 
 5. ### Install requirements
-```pip3 install -r requirements.txt```
+```pip3 install -r backend/server/requirements.txt```
 
 6. ### Run development server (from ```backend/server/```)
 ```python3 manage.py runserver```
