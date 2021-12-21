@@ -52,9 +52,11 @@ def get_data(df, param_list, target_column, adjust, round, fixed, threshold):
 
     param_list = eval(param_list)
     y = df.loc[:, target_column].values
+    results.y = y
     # Adjust the regressand.
     if adjust is not None:
         y = y * adjust
+        results.y = y
     else:
         pass
     if fixed is not None:

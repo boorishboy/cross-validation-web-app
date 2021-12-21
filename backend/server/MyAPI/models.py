@@ -57,6 +57,7 @@ class Results(models.Model):
     stddev_relative_error_nnls = models.FloatField(default=None)
     rmse_nnls = models.FloatField(default=None)
     r2_score_nnls = models.FloatField(default=None)
+    y = models.TextField(default=None)
 
 
 
