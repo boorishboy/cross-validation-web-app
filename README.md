@@ -2,16 +2,22 @@
 ## Installation
 1. ### Clone git repo
 ```git clone https://github.com/boorishboy/cross-validation-web-app.git```
+
 2. ### Install ```virtualenv```
 ```pip install virtualenv```
+
 3. ### Create virtual environment
 ```python3 -m venv venv```
+
 4. ### Activate virtuall environment
 ```source venv/bin/activate```
+
 5. ### Install requirements
 ```pip3 install -r requirements.txt```
+
 6. ### Run development server (from ```backend/server/```)
 ```python3 manage.py runserver```
+
 ## UI pictures
 1. Home ![home](https://github.com/boorishboy/cross-validation-web-app/blob/main/pics/home.png)
 2. New Run ![new-run](https://github.com/boorishboy/cross-validation-web-app/blob/main/pics/new%20run%20input.png)
