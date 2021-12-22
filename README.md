@@ -15,6 +15,10 @@
 5. ### Install requirements
 ```pip3 install -r backend/server/requirements.txt```
 
+6. ### Make database migrations in ```backend/server```
+```python3 manage.py makemigrations MyAPI```  
+```python3 manage.py migrate```
+
 6. ### Run development server (from ```backend/server/```)
 ```python3 manage.py runserver```
 
