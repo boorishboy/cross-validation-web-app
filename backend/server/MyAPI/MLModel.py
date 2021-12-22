@@ -52,11 +52,11 @@ def get_data(df, param_list, target_column, adjust, round, fixed, threshold):
 
     param_list = eval(param_list)
     y = df.loc[:, target_column].values
-    results.y = y
+    results.y = str(list(y))
     # Adjust the regressand.
     if adjust is not None:
         y = y * adjust
-        results.y = y
+        results.y = str(list(y))
     else:
         pass
     if fixed is not None:
@@ -160,6 +160,7 @@ def get_data(df, param_list, target_column, adjust, round, fixed, threshold):
             results.mean_percentage_error_nnls = mean_percentage_error
             results.percentage_error_vect_nnls = str([np.round(num, round+5) for num in list(percentage_error_vect)])
 
+
             # Determine and print the median error.
             results.median_percentage_error_nnls = np.round(np.median(
                 percentage_error_vect) * 100.0, round)
@@ -211,6 +212,7 @@ def get_data(df, param_list, target_column, adjust, round, fixed, threshold):
                 percentage_error_vect).mean() * 100.0
             results.mean_percentage_error_ols = np.round(mean_percentage_error, round)
             results.percentage_error_vect_ols = str([np.round(num, round+5) for num in list(percentage_error_vect)])
+
             # print("MEAN(percentage_error_%s) = %.5f%%" %
             #       (get_mode_name(i), mean_percentage_error[i] * 100.0))
 

@@ -76,7 +76,7 @@ def input(request):
             results.runid = Parameters.objects.latest('runid')
             results.save()
             os.remove(path)
-            return redirect('results/result_detail.html')
+            return redirect('/dashboard/')
 
 
     form = ParametersForm()
@@ -110,6 +110,7 @@ class InputView(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         upload_timestamp = timezone.now()
         inputFile = self.request.FILES['inputFile'].read()
+        print(inputFile)
         paramList = stringToList(serializer.validated_data['paramList'])
         targetColumn = serializer.validated_data['targetColumn']
         try:
