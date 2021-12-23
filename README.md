@@ -19,8 +19,12 @@
 ```python3 manage.py makemigrations MyAPI```  
 ```python3 manage.py migrate```
 
-6. ### Run development server (from ```backend/server/```)
+7. ### Run development server (from ```backend/server/```)
 ```python3 manage.py runserver```
+
+## Run via command line
+```curl -F "inputFile=@/Users/boorish/Desktop/data-HW-and-TL.csv" -F "paramList=Executed insns (no MULS), MULS insns, Taken branches, RAM data reads, RAM writes, Flash data reads, Flash insn reads, BL insns, PUSH/POP PC/LR" -F 'targetColumn=HW Cycles (IT adjusted)' -F "round=5" -F "threshold=5" localhost:8000/api/input/
+```
 
 ## UI pictures
 1. Home ![home](https://github.com/boorishboy/cross-validation-web-app/blob/main/pics/home.png)
