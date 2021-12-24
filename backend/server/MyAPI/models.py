@@ -20,13 +20,13 @@ class Parameters(models.Model):
         return str(self.upload_timestamp) + " " + str(self.paramList)
 
 class Results(models.Model):
-    runid = models.OneToOneField(
+    resultid = models.OneToOneField(
         Parameters,
         related_name = 'results',
         on_delete = models.CASCADE,
+        primary_key = True
     )
-    resultid = models.AutoField(primary_key=True)
-    file_hash = models.CharField(max_length=32, default=None)
+    file_hash = models.CharField(max_length=64, default=None)
     upload_timestamp = models.DateTimeField(default=None)
     results_timestamp = models.DateTimeField(default=None)
     rkf_scores = models.CharField(max_length=255, default=None)

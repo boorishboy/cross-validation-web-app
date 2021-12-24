@@ -38,6 +38,7 @@ def stringToDict(string):
 
 def get_checksum(file):
     hash = hashlib.md5()
+    print(file)
     for chunk in iter(lambda: file.read(4096), b""):
         hash.update(chunk)
     return hash.hexdigest()
@@ -60,14 +61,24 @@ def input(request):
             # Use process PID to distinguish data files between instances
             path = settings.TMP_FILES + '/data' + str(os.getpid()) + '.csv'
             parameters = form.save(commit=False)
-            with open(path, 'w+b') as f:
+            hash = hashlib.md5()
+            # with open(path, 'w+b') as f:
+            #     for chunk in iter(lambda: f.read(4096), b""):
+            #         hash.update(chunk)
+            #     parameters.file_hash = hash.hexdigest()
+            #     f.write(inputFile)
+            #     f.close()
+            with open(path, 'wb+') as f:
                 f.write(inputFile)
+                f.seek(0)
+                hash.update(f.read())
+                file_hash = hash.hexdigest()
                 f.close()
             data = pd.read_csv(path)
             upload_timestamp = timezone.now()
             parameters.upload_timestamp = upload_timestamp
-            file_hash = get_checksum(request.FILES['inputFile'])
-            parameters.file_hash = file_hash
+            # file_hash = get_checksum(request.FILES['inputFile'].read())
+            # parameters.file_hash = file_hash
             parameters.save()
             results = MLModel.get_data(data, paramList, targetColumn,
                               adjust, round, fixed, threshold)
@@ -110,7 +121,6 @@ class InputView(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         upload_timestamp = timezone.now()
         inputFile = self.request.FILES['inputFile'].read()
-        print(inputFile)
         paramList = stringToList(serializer.validated_data['paramList'])
         targetColumn = serializer.validated_data['targetColumn']
         try:
@@ -124,18 +134,24 @@ class InputView(viewsets.ModelViewSet):
             fixed = None
         threshold = serializer.validated_data['threshold']
         path = settings.TMP_FILES + '/data' + str(os.getpid()) + '.csv'
-        with open(path, 'w+b') as f:
+        hash = hashlib.md5()
+        with open(path, 'wb+') as f:
             f.write(inputFile)
+            f.seek(0)
+            hash.update(f.read())
+            file_hash = hash.hexdigest()
             f.close()
         data = pd.read_csv(path)
         results = MLModel.get_data(data, paramList, targetColumn,
                           adjust, round, fixed, threshold)
-        file_hash = get_checksum(self.request.FILES['inputFile'])
+        #file_hash = get_checksum(self.request.FILES['inputFile'])
         results.file_hash = file_hash
         results.upload_timestamp = upload_timestamp
         serializer.save(file_hash=file_hash, upload_timestamp=upload_timestamp)
         results.runid = Parameters.objects.latest('runid')
+        os.remove(path)
         results.save()
+
 
 class ResultsView(viewsets.ModelViewSet):
     queryset = Results.objects.all()
