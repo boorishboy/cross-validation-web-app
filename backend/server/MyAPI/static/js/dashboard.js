@@ -71,12 +71,11 @@ $(document).ready(function() {
       type: "GET",
       dataType: "json",
       success: (data) => {
+        console.log(data)
         var dataRKF = StringArrayToFloat(data.results.rkf_scores);
         var dataCV = StringArrayToFloat(data.results.cv_scores)
         var y_data = StringArrayToFloat(data.results.y)
-        console.log(y_data)
         var percentage_error_vect_ols = StringArrayToFloat(data.results.percentage_error_vect_ols)
-        console.log(percentage_error_vect_ols.slice(75))
         var coefs_ols = StringArrayToFloat(data.results.coefs_ols)
         // var dataCoefsOLS = data.results.coefs_ols.replace(/[\[\]']+/g, '').split(", ");
         // dataCoefsOLS = dataCoefsOLS.map(numStr => parseFloat(numStr));

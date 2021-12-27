@@ -6,7 +6,7 @@ from django.conf import settings
 
 class Parameters(models.Model):
     runid = models.AutoField(primary_key=True)
-    upload_timestamp = models.DateTimeField(default=None)
+    upload_timestamp = models.DateTimeField(auto_now_add=True)
     file_hash = models.CharField(max_length=32, default=None)
     inputFile = models.FileField(storage=FileSystemStorage(location=settings.MEDIA_ROOT), upload_to='uploads', default=None)
     paramList = models.TextField(default=None)
@@ -20,15 +20,15 @@ class Parameters(models.Model):
         return str(self.upload_timestamp) + " " + str(self.paramList)
 
 class Results(models.Model):
-    resultid = models.OneToOneField(
+    runid = models.OneToOneField(
         Parameters,
         related_name = 'results',
         on_delete = models.CASCADE,
-        primary_key = True
     )
+    resultid = models.AutoField(primary_key=True)
     file_hash = models.CharField(max_length=64, default=None)
     upload_timestamp = models.DateTimeField(default=None)
-    results_timestamp = models.DateTimeField(default=None)
+    results_timestamp = models.DateTimeField(auto_now_add=True)
     rkf_scores = models.CharField(max_length=255, default=None)
     rkf_mean = models.FloatField(default=None)
     rkf_stddev = models.FloatField(default=None)

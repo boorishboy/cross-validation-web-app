@@ -22,7 +22,6 @@ NNLS = 0
 OLS = 1
 
 results = Results()
-np.set_printoptions(suppress=True)
 
 def get_mode_name(mode):
     '''Return name of the current mode.'''

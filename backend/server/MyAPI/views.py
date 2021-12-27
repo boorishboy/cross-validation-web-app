@@ -36,12 +36,6 @@ def stringToDict(string):
     inputString = "{" + string + "}"
     return inputString
 
-def get_checksum(file):
-    hash = hashlib.md5()
-    print(file)
-    for chunk in iter(lambda: file.read(4096), b""):
-        hash.update(chunk)
-    return hash.hexdigest()
 
 
 def input(request):
@@ -78,13 +72,15 @@ def input(request):
             upload_timestamp = timezone.now()
             parameters.upload_timestamp = upload_timestamp
             # file_hash = get_checksum(request.FILES['inputFile'].read())
-            # parameters.file_hash = file_hash
-            parameters.save()
+            parameters.file_hash = file_hash
+
             results = MLModel.get_data(data, paramList, targetColumn,
                               adjust, round, fixed, threshold)
+            parameters.save()
             results.file_hash = file_hash
             results.upload_timestamp = upload_timestamp
             results.runid = Parameters.objects.latest('runid')
+            results.pk = None
             results.save()
             os.remove(path)
             return redirect('/dashboard/')
@@ -144,11 +140,12 @@ class InputView(viewsets.ModelViewSet):
         data = pd.read_csv(path)
         results = MLModel.get_data(data, paramList, targetColumn,
                           adjust, round, fixed, threshold)
-        #file_hash = get_checksum(self.request.FILES['inputFile'])
         results.file_hash = file_hash
-        results.upload_timestamp = upload_timestamp
-        serializer.save(file_hash=file_hash, upload_timestamp=upload_timestamp)
+        serializer.save(file_hash=file_hash)
+        results.pk = None
+        print(results.pk)
         results.runid = Parameters.objects.latest('runid')
+        results.upload_timestamp = upload_timestamp
         os.remove(path)
         results.save()
 
