@@ -77,6 +77,8 @@ $(document).ready(function() {
         var y_data = StringArrayToFloat(data.results.y)
         var percentage_error_vect_ols = StringArrayToFloat(data.results.percentage_error_vect_ols)
         var coefs_ols = StringArrayToFloat(data.results.coefs_ols)
+        var percentage_error_vect_nnls = StringArrayToFloat(data.results.percentage_error_vect_nnls)
+        var coefs_nnls = StringArrayToFloat(data.results.coefs_nnls)
         // var dataCoefsOLS = data.results.coefs_ols.replace(/[\[\]']+/g, '').split(", ");
         // dataCoefsOLS = dataCoefsOLS.map(numStr => parseFloat(numStr));
         // var dataCoefsOLS = data.results.coefs_ols.replace(/[\[\]']+/g, '').split(", ");
@@ -193,6 +195,9 @@ $(document).ready(function() {
         plotRKF(dataRKF, data);
         plotCV(dataCV, data);
         plotOLS_first(y_data, percentage_error_vect_ols, data);
+        plotOLSCoefs(coefs_ols, data);
+        plotNNLS_eror(y_data, percentage_error_vect_nnls, data);
+        plotNNLSCoefs(coefs_nnls, data);
         $("td").tooltip({
           container: 'body'
         });

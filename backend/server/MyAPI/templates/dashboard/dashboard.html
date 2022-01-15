@@ -11,7 +11,7 @@
   <div class='row row-m-t'>
     <div class="col-12 center-block">
 
-      <h1>Hello, World!</h1>
+      <!-- <h1>Hello, World!</h1> -->
       <select class="form-select form-select-sm" aria-label=".form-select-sm example">
         <option selected>Open this select menu</option>
         {% for p in parameters %}
@@ -79,22 +79,40 @@
           </div>
         </div>
         <div class="tab-pane" id="results-ols" role="tabpanel" aria-labelledby="results-ols-tab">
-          <div class="row">
-          <table id="results-ols-table" class="table table-hover">
-            <tbody>
-            </tbody>
-          </table>
-        </div>
-        <div class="row">
-          <div id='ols-first-plot'>
+          <div class="container-fluid container-12padding">
+            <div class="row">
+              <table id="results-ols-table" class="table table-hover">
+                <tbody>
+                </tbody>
+              </table>
+            </div>
+            <div class="row">
+              <div id='ols-error-plot'>
+              </div>
+            </div>
+            <div class="row">
+              <div id="ols-coef">
+              </div>
+            </div>
           </div>
         </div>
-        </div>
         <div class="tab-pane" id="results-nnls" role="tabpanel" aria-labelledby="results-nnls-tab">
-          <table id="results-nnls-table" class="table table-hover">
-            <tbody>
-            </tbody>
-          </table>
+          <div class="container-fluid container-12padding">
+            <div class="row">
+              <table id="results-nnls-table" class="table table-hover">
+                <tbody>
+                </tbody>
+              </table>
+            </div>
+            <div class="row">
+              <div id='nnls-error-plot'>
+              </div>
+            </div>
+            <div class="row">
+              <div id="nnls-coef">
+              </div>
+            </div>
+          </div>
         </div>
         <div class="tab-pane" id="raw-data" role="tabpanel" aria-labelledby="raw-data-tab">
           <div class="container-fluid container-12padding">

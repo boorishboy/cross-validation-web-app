@@ -44,6 +44,17 @@ pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; }
 .null { color: magenta; }
 .key { color: darkred; }
 
-/* .btn#json-download {
-  float: right;
-} */
+h1 {
+  wght: 700;
+}
+
+p.desription {
+  wght: 300;
+}
+
+p.statement {
+  wght: 100;
+}
+span.lower {
+  margin-top: 20px;
+}

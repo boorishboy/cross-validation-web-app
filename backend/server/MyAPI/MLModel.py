@@ -149,8 +149,8 @@ def get_data(df, param_list, target_column, adjust, round, fixed, threshold):
             results.outliers_nnls = str([(bench, predicted, actual, 100 * (predicted - actual) / actual) for (bench, predicted, actual) in zip(df.loc[:, 'Bench'], predicted[i], y) if abs(predicted - actual) / actual > threshold])
 
             # Determine and print mean(abs(relative error)).
-            mean_abs_percentage_error = np.round(mean_absolute_error(
-                y / y, predicted[i] / y) * 100.0, round)
+            mean_abs_percentage_error = np.round((mean_absolute_error(
+                y / y, predicted[i] / y) * 100.0), round)
             results.mean_abs_percentage_error_nnls = mean_abs_percentage_error
 
             # Determine and print mean(percentage error).
@@ -171,13 +171,11 @@ def get_data(df, param_list, target_column, adjust, round, fixed, threshold):
             results.rmsre_nnls = np.round(np.sqrt(mean_squared_RE) * 100.0, round)
             # print("rootMSRE_%s = %.5f%%" % (get_mode_name(i), rmsre[i] * 100.0))
 
-            results.stddev_abs_percentage_error_nnls = np.round(np.sqrt(mean_squared_error(np.full(
-                y.shape, mean_abs_percentage_error), predicted[i] / y - np.full(y.shape, 1.0))) * 100.0, round)
+            results.stddev_abs_percentage_error_nnls = np.sqrt(mean_squared_error(np.full(y.shape, mean_abs_percentage_error), predicted[i]/y - np.full(y.shape, 1.0)))
             # print("STDDEV(MAPE_%s) = %.5f%%" %
             #       (get_mode_name(i), stddev_abs_percentage_error[i] * 100.0))
 
-            results.stddev_relative_error_nnls = np.round(np.sqrt(mean_squared_error(np.full(
-                y.shape, mean_percentage_error), predicted[i] / y - np.full(y.shape, 1.0))) * 100.0, round)
+            results.stddev_relative_error_nnls = np.sqrt(mean_squared_error(np.full(y.shape, mean_percentage_error), predicted[i]/y - np.full(y.shape, 1.0)))
             # print("STDDEV(percentage_error_%s) = %.5f%%" %
             #       (get_mode_name(i), stddev_relative_error[i] * 100.0))
 
@@ -185,7 +183,7 @@ def get_data(df, param_list, target_column, adjust, round, fixed, threshold):
             rmse = np.sqrt(mse)
             r2 = r2_score(y, predicted[i])
             results.rmse_nnls = np.round(rmse, round)
-            results.r2_score_nnls = np.round(r2, round)
+            results.r2_score_nnls = r2
             # print(("RMSE Score %s:" % get_mode_name(i)) + str(rmse))
             # print(("R2 Score %s:" % get_mode_name(i)) + str(r2_score(y, predicted[i])))
 
@@ -223,16 +221,14 @@ def get_data(df, param_list, target_column, adjust, round, fixed, threshold):
 
             # Determine and print root of mean square relative error.
             mean_squared_RE = mean_squared_error(y / y, predicted[i] / y)
-            results.rmsre_ols = np.round(np.sqrt(mean_squared_RE) * 100.0, round)
+            results.rmsre_ols = np.round((np.sqrt(mean_squared_RE) * 100.0), round)
             # print("rootMSRE_%s = %.5f%%" % (get_mode_name(i), rmsre[i] * 100.0))
 
-            results.stddev_abs_percentage_error_ols = np.round(np.sqrt(mean_squared_error(np.full(
-                y.shape, mean_abs_percentage_error), predicted[i] / y - np.full(y.shape, 1.0))) * 100.0, round)
+            results.stddev_abs_percentage_error_ols = np.sqrt(mean_squared_error(np.full(y.shape, mean_abs_percentage_error), predicted[i]/y - np.full(y.shape, 1.0)))
             # print("STDDEV(MAPE_%s) = %.5f%%" %
             #       (get_mode_name(i), stddev_abs_percentage_error[i] * 100.0))
 
-            results.stddev_relative_error_ols = np.round(np.sqrt(mean_squared_error(np.full(
-                y.shape, mean_percentage_error), predicted[i] / y - np.full(y.shape, 1.0))) * 100.0, round)
+            results.stddev_relative_error_ols = np.sqrt(mean_squared_error(np.full(y.shape, mean_percentage_error), predicted[i]/y - np.full(y.shape, 1.0)))
             # print("STDDEV(percentage_error_%s) = %.5f%%" %
             #       (get_mode_name(i), stddev_relative_error[i] * 100.0))
 
@@ -240,7 +236,7 @@ def get_data(df, param_list, target_column, adjust, round, fixed, threshold):
             rmse = np.sqrt(mse)
             r2 = r2_score(y, predicted[i])
             results.rmse_ols = np.round(rmse, round)
-            results.r2_score_ols = np.round(r2, round)
+            results.r2_score_ols = r2
             # print(("RMSE Score %s:" % get_mode_name(i)) + str(rmse))
             # print(("R2 Score %s:" % get_mode_name(i)) + str(r2_score(y, predicted[i])))
 
