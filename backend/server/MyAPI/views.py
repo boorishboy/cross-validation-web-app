@@ -42,6 +42,7 @@ def input(request):
     if request.method == 'POST':
         form = ParametersForm(request.POST, request.FILES)
         if form.is_valid():
+            upload_timestamp = timezone.now()
             inputFile = request.FILES['inputFile'].read()
             paramList = stringToList(form.cleaned_data['paramList'])
             targetColumn = form.cleaned_data['targetColumn']
@@ -69,7 +70,6 @@ def input(request):
                 file_hash = hash.hexdigest()
                 f.close()
             data = pd.read_csv(path)
-            upload_timestamp = timezone.now()
             parameters.upload_timestamp = upload_timestamp
             # file_hash = get_checksum(request.FILES['inputFile'].read())
             parameters.file_hash = file_hash

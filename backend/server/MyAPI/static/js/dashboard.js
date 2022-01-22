@@ -7,9 +7,9 @@ $(document).ready(function() {
 
   function truncateContent(string) {
     if (string.includes(", ")) {
-      var list = string.replace(/[\[\]']+/g, '').split(",");
+      let list = string.replace(/[\[\]']+/g, '').split(",");
       if (list.length > 10) {
-        var slicedArray = list.slice(0, 10);
+        let slicedArray = list.slice(0, 10);
         slicedArray.push(" ...");
         return slicedArray;
       } else {
@@ -17,9 +17,9 @@ $(document).ready(function() {
       }
     } else {
       string.replace(/[\[\]']+/g, '');
-      var list = string.replace(/[\[\]']+/g, '').split(" ");
+      let list = string.replace(/[\[\]']+/g, '').split(" ");
       if (list.length > 10) {
-        var slicedArray = list.slice(0, 10);
+        let slicedArray = list.slice(0, 10);
         slicedArray.push(" ...");
         return slicedArray;
       } else {

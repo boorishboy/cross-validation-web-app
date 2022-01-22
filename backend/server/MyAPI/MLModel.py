@@ -171,11 +171,11 @@ def get_data(df, param_list, target_column, adjust, round, fixed, threshold):
             results.rmsre_nnls = np.round(np.sqrt(mean_squared_RE) * 100.0, round)
             # print("rootMSRE_%s = %.5f%%" % (get_mode_name(i), rmsre[i] * 100.0))
 
-            results.stddev_abs_percentage_error_nnls = np.sqrt(mean_squared_error(np.full(y.shape, mean_abs_percentage_error), predicted[i]/y - np.full(y.shape, 1.0)))
+            results.stddev_abs_percentage_error_nnls = np.round(np.sqrt(mean_squared_error(np.full(y.shape, mean_abs_percentage_error), predicted[i]/y - np.full(y.shape, 1.0))), round)
             # print("STDDEV(MAPE_%s) = %.5f%%" %
             #       (get_mode_name(i), stddev_abs_percentage_error[i] * 100.0))
 
-            results.stddev_relative_error_nnls = np.sqrt(mean_squared_error(np.full(y.shape, mean_percentage_error), predicted[i]/y - np.full(y.shape, 1.0)))
+            results.stddev_relative_error_nnls = np.round(np.sqrt(mean_squared_error(np.full(y.shape, mean_percentage_error), predicted[i]/y - np.full(y.shape, 1.0))), round)
             # print("STDDEV(percentage_error_%s) = %.5f%%" %
             #       (get_mode_name(i), stddev_relative_error[i] * 100.0))
 
@@ -224,11 +224,11 @@ def get_data(df, param_list, target_column, adjust, round, fixed, threshold):
             results.rmsre_ols = np.round((np.sqrt(mean_squared_RE) * 100.0), round)
             # print("rootMSRE_%s = %.5f%%" % (get_mode_name(i), rmsre[i] * 100.0))
 
-            results.stddev_abs_percentage_error_ols = np.sqrt(mean_squared_error(np.full(y.shape, mean_abs_percentage_error), predicted[i]/y - np.full(y.shape, 1.0)))
+            results.stddev_abs_percentage_error_ols = np.round(np.sqrt(mean_squared_error(np.full(y.shape, mean_abs_percentage_error), predicted[i]/y - np.full(y.shape, 1.0))), round)
             # print("STDDEV(MAPE_%s) = %.5f%%" %
             #       (get_mode_name(i), stddev_abs_percentage_error[i] * 100.0))
 
-            results.stddev_relative_error_ols = np.sqrt(mean_squared_error(np.full(y.shape, mean_percentage_error), predicted[i]/y - np.full(y.shape, 1.0)))
+            results.stddev_relative_error_ols = np.round(np.sqrt(mean_squared_error(np.full(y.shape, mean_percentage_error), predicted[i]/y - np.full(y.shape, 1.0))), round)
             # print("STDDEV(percentage_error_%s) = %.5f%%" %
             #       (get_mode_name(i), stddev_relative_error[i] * 100.0))
 
