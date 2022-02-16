@@ -57,12 +57,6 @@ def input(request):
             path = settings.TMP_FILES + '/data' + str(os.getpid()) + '.csv'
             parameters = form.save(commit=False)
             hash = hashlib.md5()
-            # with open(path, 'w+b') as f:
-            #     for chunk in iter(lambda: f.read(4096), b""):
-            #         hash.update(chunk)
-            #     parameters.file_hash = hash.hexdigest()
-            #     f.write(inputFile)
-            #     f.close()
             with open(path, 'wb+') as f:
                 f.write(inputFile)
                 f.seek(0)
@@ -107,12 +101,6 @@ class CombinedView(viewsets.ModelViewSet):
 class InputView(viewsets.ModelViewSet):
     queryset = Parameters.objects.all()
     serializer_class = InputSerializer
-
-    # def create(self, request, *args, **kwargs):
-    #     serializer = self.get_serializer(data=request.data)
-    #     serializer.is_valid(raise_exception=True)
-    #     self.perform_create()
-
 
     def perform_create(self, serializer):
         upload_timestamp = timezone.now()

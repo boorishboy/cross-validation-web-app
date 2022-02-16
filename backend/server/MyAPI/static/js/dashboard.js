@@ -71,7 +71,6 @@ $(document).ready(function() {
       type: "GET",
       dataType: "json",
       success: (data) => {
-        console.log(data)
         var dataRKF = StringArrayToFloat(data.results.rkf_scores);
         var dataCV = StringArrayToFloat(data.results.cv_scores)
         var y_data = StringArrayToFloat(data.results.y)
@@ -79,10 +78,6 @@ $(document).ready(function() {
         var coefs_ols = StringArrayToFloat(data.results.coefs_ols)
         var percentage_error_vect_nnls = StringArrayToFloat(data.results.percentage_error_vect_nnls)
         var coefs_nnls = StringArrayToFloat(data.results.coefs_nnls)
-        // var dataCoefsOLS = data.results.coefs_ols.replace(/[\[\]']+/g, '').split(", ");
-        // dataCoefsOLS = dataCoefsOLS.map(numStr => parseFloat(numStr));
-        // var dataCoefsOLS = data.results.coefs_ols.replace(/[\[\]']+/g, '').split(", ");
-        // dataCoefsOLS = dataCoefsOLS.map(numStr => parseFloat(numStr));
 
 
         var paramTableBody = $("#parameters-table tbody")
@@ -127,10 +122,6 @@ $(document).ready(function() {
                   var keyDataVal = i;
 
                   var valueDataVal = (typeof(item) == 'string') ? item.replace(/[\[\]']+/g, '') : item;
-                  // var valueDataVal = item;
-                  // } else if (i == "resultid" || valuesToPass.includes(i)) {
-                  //   var keyDataVal = i;
-                  //   var valueDataVal = item;
 
 
                   dataValTableBody.append(
