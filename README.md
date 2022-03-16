@@ -22,8 +22,22 @@
 7. ### Run development server (from ```backend/server/```)
 ```python3 manage.py runserver```
 
+
+## Example set of input parameters
+
+- InputFile: ```data-HW-and-TL.csv```
+- ParamList: ```"Executed insns (no MULS), MULS insns, Taken branches, RAM data reads, RAM writes, Flash data reads, Flash insn reads, BL insns, PUSH/POP PC/LR"```
+- TargetColumn: ```HW Cycles (IT adjusted)```
+- Adjust: ```0```
+- Round: ```5```
+- Fixed: ```none```
+- Threshold: ```5```
+
+
 ## Run via command line
-```curl -F "inputFile=@/Users/boorish/Desktop/data-HW-and-TL.csv" -F "paramList=Executed insns (no MULS), MULS insns, Taken branches, RAM data reads, RAM writes, Flash data reads, Flash insn reads, BL insns, PUSH/POP PC/LR" -F 'targetColumn=HW Cycles (IT adjusted)' -F "round=5" -F "threshold=5" localhost:8000/api/input/```
+```bash
+curl -F "inputFile=@/Users/boorish/Desktop/data-HW-and-TL.csv" -F "paramList=Executed insns (no MULS), MULS insns, Taken branches, RAM data reads, RAM writes, Flash data reads, Flash insn reads, BL insns, PUSH/POP PC/LR" -F 'targetColumn=HW Cycles (IT adjusted)' -F "round=5" -F "threshold=5" localhost:8000/api/input/
+```
 
 ## UI pictures
 1. Home ![home](https://github.com/boorishboy/cross-validation-web-app/blob/main/pics/home.png)
